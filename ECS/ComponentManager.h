@@ -3,24 +3,36 @@
 
 #include "IComponent.h"
 
+#include "SystemManager.h"
+
 #include <string>
 #include <map>
+#include <tuple>
+#include <vector>
 
 namespace ECS {
+
+
 
     // Manager for all Components Created by this Manager
     class ComponentManager {
 
-        class EntityManager*                m_entityManager;
+        using ComponentMap = std::map< ComponentType, std::map<EntityId, std::map<ComponentId, IComponent*> > >;
 
-        // TODO: Think about what would be most efficient container for the Component Pointers
-        std::map<ComponentId, IComponent*>   m_components;
+        ComponentMap                        m_components;
+
+        // Always incremented, never decremented
+        uint32_t                            m_componentCounter;
+
+        SystemManager*                      m_systemManager;
 
     public:
 
-        ComponentManager() : m_entityManager(nullptr) {}
+        ComponentManager() : m_componentCounter(0), m_systemManager(nullptr) {}
 
-        ~ComponentManager() { RemoveAllComponents(); }
+        ~ComponentManager() {}
+
+        void AssignSystemManager( SystemManager* systemManager ) { m_systemManager = systemManager; }
 
 
         // Adds a Component this Component Manager, assigning its Owning EntityId to the EntityId passed
@@ -33,33 +45,35 @@ namespace ECS {
             if (!component)
                 return nullptr;
 
+
             component->m_ownerId = entityId;
+            component->m_componentId = ++m_componentCounter;
 
-            // TODO: Component Id will be the hash value for the component
-            ComponentId componentId = entityId + "- Component - " + std::to_string(m_components.size() + 1);
-            component->m_componentId = componentId;
+            
+            m_components[component->m_type][entityId][component->m_componentId] = component;
 
-            m_components[componentId] = component;
-
+            m_systemManager->OnComponentAdded( component );
+           
             return dynamic_cast<T*>(component);
 
         }
 
 
         // Removes Component with the passed ComponentId
-        void RemoveComponent(ComponentId componentId)
+        template<typename T>
+        void RemoveComponent(EntityId entityId, ComponentId componentId)
         {
 
             // Find the component in the map of components
 
-            IComponent* component = GetComponent(componentId);
+            IComponent* component = GetComponent<T>(entityId, componentId);
 
             if (!component)
                 return;
 
-            delete component, component = nullptr;
+            m_components[component->m_type][entityId].erase( componentId );
 
-            m_components.erase(componentId);
+            delete component, component = nullptr;
 
         }
 
@@ -68,12 +82,36 @@ namespace ECS {
         // Clears out all components on this component manager
         bool RemoveAllComponents()
         {
+            IComponent* temp = nullptr;
+            for ( auto component : m_components )
+            {
 
-            for (auto component : m_components) {
+                for ( auto comp : component.second )
+                {
 
-                delete component.second, component.second = nullptr;    // Deleting the pointer
+                    for ( auto c : comp.second )
+                    {
+
+                        if ( c.second != nullptr)
+                        {
+
+                            temp = m_components[component.first][comp.first][c.first];
+                            delete c.second;
+                            c.second = nullptr;
+
+                        }
+
+                    }
+
+                    comp.second.clear();
+                    
+                }
+
+                component.second.clear();
 
             }
+
+
 
             return m_components.empty();
 
@@ -81,11 +119,28 @@ namespace ECS {
 
 
         // Returns the Component with the Component Id inside this Component Manager
-        IComponent* GetComponent(ComponentId componentId) 
+        template<typename T>
+        IComponent* GetComponent( EntityId entityId, ComponentId componentId )
         {
-            // TODO: Change to hash_map
-            if (m_components.find(componentId) != m_components.end()) {
-                return m_components[componentId];
+
+            // First create a temporary Icomponent object using this type
+            IComponent* temp = dynamic_cast<IComponent*>(new T());
+
+            if ( !temp )
+                return nullptr;
+
+            
+            
+            if (m_components.find( temp->m_type ) != m_components.end()) {
+
+                if ( m_components[temp->m_type].find( entityId ) != m_components[temp->m_type].end() )
+                {
+                    if ( m_components[temp->m_type][entityId].find( componentId ) != m_components[temp->m_type][entityId].end() )
+                    {
+                        return m_components[temp->m_type][entityId][componentId];
+                    }
+
+                }
             }
             return nullptr;
 

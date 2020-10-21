@@ -22,12 +22,17 @@ namespace ECS {
 
         // TODO: Make an linked-listed of Entities that are pending a clean up, Create a System to clear out these Entities on a schedule
 
+        // Always incremented, never decremented
+        uint32_t                        m_entityCounter;
 
     public:
 
-        EntityManager(ComponentManager* componentManager) : 
-            m_componentManager(componentManager) {}
-        ~EntityManager() {}
+        EntityManager() : 
+            m_componentManager(nullptr), m_entityCounter(0) {}
+        
+        ~EntityManager() { DestroyAllEntities(); }
+
+        void AssignComponentManager( ComponentManager* componentManager ) { m_componentManager = componentManager; }
 
 
         // Creates an Entity of the passed Entity SubClass, returns an EntityId
@@ -38,17 +43,14 @@ namespace ECS {
             IEntity* entity = dynamic_cast<IEntity*>(new T());
 
             if (!entity)
-                return "";
+                return 0;
 
-            // TODO: Have a hash table value be the Entity Id instead
-            auto entityId = "Entity-" + std::to_string(m_entities.size() + 1);    // Generated name of the Entity
-
-            entity->m_entityId = entityId;
+            entity->m_entityId = ++m_entityCounter;
             entity->m_componentManager = m_componentManager;
 
-            m_entities[entityId] =  entity;
+            m_entities[m_entityCounter] =  entity;
 
-            return entityId;
+            return m_entityCounter;
 
         }
 

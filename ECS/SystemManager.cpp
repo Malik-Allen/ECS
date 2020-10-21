@@ -5,7 +5,7 @@
 namespace ECS {
 
 
-	SystemManager::SystemManager(EntityManager* entityManager) : m_entityManager(entityManager) {}
+	SystemManager::SystemManager() : m_entityManager(nullptr) {}
 
 	SystemManager::~SystemManager() {}
 

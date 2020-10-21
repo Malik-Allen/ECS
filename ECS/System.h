@@ -3,6 +3,7 @@
 
 #include "ISystem.h"
 #include "IEntity.h"
+#include "IComponent.h"
 
 #include <tuple>
 #include <vector>
@@ -11,49 +12,44 @@ namespace ECS {
 
 	class EntityManager;
 
-	template <typename... Comps>
+
+	// Unfortunately.. for now
+	template <typename T>
 	class System : public ISystem
 	{
-		using ComponentTuple = std::tuple <Comps* ... > ;
+		
 
 	protected:
 
-		std::vector<ComponentTuple> m_components;
+		std::vector<T*> m_components;
+		
+
 
 	public:
 
 		System(EntityManager* entityComponent) : ISystem(entityComponent) {}
 		virtual ~System() {}
 
-		virtual void OnEntityCreated(const IEntity& entity) override final;
-		virtual void OnEntityRemoved(const IEntity& entity) override final;
+	private:
 
+		// Whenever we add a new component, lets go through our lists of systems on the manager 
 		
-
-	};
-
-
-	template<typename ...Comps>
-	inline void System<Comps...>::OnEntityCreated( const IEntity& entity )
-	{
-
-		ComponentTuple compTuple;
-		size_t matchingComponents = 0;
-
-		for ( auto compPair : entity.GetComponents() )
+		virtual void OnComponentAdded( IComponent* component ) override final
 		{
 
+			T* componentType = dynamic_cast<T*>(component);
+
+			if ( componentType != nullptr )
+			{
+				m_components.push_back( componentType );
+			}
 			
 
 		}
 
+		
 
-	}
-
-	template<typename ...Comps>
-	inline void System<Comps...>::OnEntityRemoved( const IEntity& entity )
-	{
-	}
+	};
 
 }
 

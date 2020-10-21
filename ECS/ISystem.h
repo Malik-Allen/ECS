@@ -4,6 +4,7 @@
 namespace ECS {
 
 	class EntityManager;
+	class IComponent;
 
 	// System 
 	class ISystem
@@ -33,8 +34,8 @@ namespace ECS {
 		// TODO: Remember Systems will be the last thing created, but it can get a little tricky if components are added after an entity has been created
 			// Think about a way to tackle this issue
 			// Should be Templated 
-		virtual void OnEntityCreated( const IEntity& entity ) = 0;
-		virtual void OnEntityRemoved( const IEntity& entity ) = 0;
+		virtual void OnComponentAdded( IComponent* component ) = 0;
+		// virtual void OnEntityRemoved( const IEntity& entity ) = 0;
 
 	};
 	

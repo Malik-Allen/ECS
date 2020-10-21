@@ -7,7 +7,7 @@
 
 namespace ECS {
 
-    typedef std::string EntityId;
+    typedef uint32_t EntityId;
 
     class ComponentManager;
 
@@ -32,7 +32,7 @@ namespace ECS {
 
         IEntity() :
             m_componentManager(nullptr),
-            m_entityId(""),
+            m_entityId(0),
             m_isActive(true)
         {}
 
@@ -53,7 +53,7 @@ namespace ECS {
         void RemoveComponent(EntityId componentId) 
         {
 
-            this->m_componentManager->RemoveComponent<T>(componentId);
+            this->m_componentManager->RemoveComponent<T>(this->m_entityId, componentId);
 
         }
 
@@ -80,8 +80,6 @@ namespace ECS {
 
         // Called when this entity is deisabled
         virtual void OnDisabled() = 0;
-
-        auto GetComponents() const { return m_componentManager->GetComponents();}
 
 
         // TODO:    IMPLEMENTATION

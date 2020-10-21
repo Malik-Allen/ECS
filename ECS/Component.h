@@ -5,11 +5,12 @@
 
 namespace ECS {
 
+
 	class Component : public IComponent {
 
 	public:
 
-		Component() {}
+		explicit Component(ComponentType type) : IComponent(type) {}	// Makes the type Manadatory for all SubClass Components
 
 		virtual ~Component() {}
 

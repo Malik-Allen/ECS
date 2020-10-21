@@ -19,11 +19,26 @@ class AudioComponent : public ECS::Component {
 
 public:
 
-	AudioComponent() {}
+	AudioComponent() : ECS::Component( Component_Type::AudioComponent ) {}
 	~AudioComponent() {}
 
 	void Play() {
 		std::cout << "The World Is Yours!" << std::endl;
+	}
+
+};
+
+class PhysicsComponent : public ECS::Component
+{
+
+public:
+
+	PhysicsComponent() : ECS::Component( Component_Type::PhysicsComponent ) {}
+	~PhysicsComponent() {}
+
+	void Run()
+	{
+		std::cout << "Every Action has a equal and opposite reaction!" << std::endl;
 	}
 
 };
@@ -41,9 +56,7 @@ public:
 
 		for (auto& component : m_components) {
 
-			AudioComponent* pAudio = std::get<AudioComponent*>(component);
-
-			pAudio->Play();
+			component->Play();
 		}
 
 	}
@@ -55,12 +68,15 @@ public:
 int main(int args, char* argv[]) {
 
 	
-
+	ECS::EntityManager* entityManager = new ECS::EntityManager();	
 	ECS::ComponentManager* componentManager = new ECS::ComponentManager();
+	ECS::SystemManager* systemManager = new ECS::SystemManager();
 
-	ECS::EntityManager* entityManager = new ECS::EntityManager(componentManager);	
+	entityManager->AssignComponentManager( componentManager );
+	componentManager->AssignSystemManager( systemManager );
+	systemManager->AssignEntityManager( entityManager );
 
-	ECS::SystemManager* systemManager = new ECS::SystemManager(entityManager);
+	AudioSystem* audioSystem = systemManager->AddSystem<AudioSystem>();
 
 	ECS::EntityId entityId = entityManager->CreateEntity<Object>();
 
@@ -70,15 +86,35 @@ int main(int args, char* argv[]) {
 
 	std::cout << "Component Id: " << audio->GetComponentId() << " Component OwnerId: " << audio->GetOwnerId() << std::endl;
 
-	AudioSystem* audioSystem = systemManager->AddSystem<AudioSystem>();
+	
 
 	
+	PhysicsComponent* physics = entityManager->GetEntity( entityId )->AddComponent<PhysicsComponent>();
+	std::cout << "Component Id: " << physics->GetComponentId() << " Component OwnerId: " << physics->GetOwnerId() << std::endl;
+
+	entityManager->GetEntity( entityId )->RemoveComponent<PhysicsComponent>( physics->GetComponentId() );
+
+	/*if ( dynamic_cast<PhysicsComponent*>(audio) )
+	{
+		audio->Play();
+	}
+	else
+	{
+		physics->Run();
+	}*/
+
+	systemManager->Update( 0.0f );
+	systemManager->Update( 0.0f );
+
 
 	entityManager->DestroyEntity(entityId);
 
-	delete componentManager, componentManager = nullptr;
+
 
 	delete entityManager, entityManager = nullptr;
+
+	delete componentManager, componentManager = nullptr;
+
 
 	return 0;
 

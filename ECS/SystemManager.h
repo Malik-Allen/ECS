@@ -4,10 +4,11 @@
 #include <vector>
 #include <iterator>
 
+#include "ISystem.h"
+
 
 namespace ECS {
 
-	class ISystem;
 	class IComponent;
 
 	// Manager for a list of Systems
@@ -22,11 +23,25 @@ namespace ECS {
 
 	public:
 
-		SystemManager(EntityManager* entityManager);
+		SystemManager();
 		~SystemManager();
+
+		void AssignEntityManager( EntityManager* entityManager ) { m_entityManager = entityManager; }
+
 
 		// Updates all Active Systems on this System Manager
 		void Update(float deltaTime);
+
+		void OnComponentAdded( IComponent* component )
+		{
+
+			for ( auto system : m_activeSystems )
+			{
+
+				system->OnComponentAdded( component );
+			}
+
+		}
 
 
 		// Add a System to this System Manager

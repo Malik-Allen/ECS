@@ -13,6 +13,8 @@
 #include "System.h"
 #include "SystemManager.h"
 
+#include "ComponentTypes.h"
+
 
 #endif // !ECS_H
 

@@ -2,10 +2,12 @@
 #define ICOMPONENT_H
 
 #include "IEntity.h"
+#include "ComponentTypes.h"
 
 namespace ECS {
 
-	typedef std::string ComponentId;
+	typedef uint32_t ComponentId;
+	typedef Component_Type ComponentType;
 
 	// Component Base Class
 	class IComponent {
@@ -23,13 +25,23 @@ namespace ECS {
 		// The active state of this component
 		bool				m_isActive;
 
+		// The type of component
+		ComponentType		m_type;
 
 	public:
 
 		IComponent() :
-			m_ownerId(""),
-			m_componentId(""),
-			m_isActive(true)
+			m_ownerId(0),
+			m_componentId(0),
+			m_isActive(true),
+			m_type(Component_Type::Default)
+		{}
+
+		IComponent(ComponentType type) :	
+			m_ownerId( 0 ),
+			m_componentId( 0 ),
+			m_isActive( true ),
+			m_type( type )
 		{}
 
 		virtual ~IComponent() {}
