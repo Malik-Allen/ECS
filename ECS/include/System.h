@@ -98,9 +98,9 @@ namespace ECS {
 		{
 			// Complile-time check to see if class T can be converted to class B, 
 				// valid for derivation check of class T from class B
-			CanConvert_From<ComponentClass, Component>();
+			// CanConvert_From<ComponentClass, Component>();
 
-			if ( component->GetComponentType() == componentType )
+			/*if ( component->GetComponentType() == componentType )
 			{
 				std::get<INDEX>( tupleToFill ) = dynamic_cast<ComponentClass*>(component);
 				return true;
@@ -109,8 +109,9 @@ namespace ECS {
 			else
 			{
 				return ProcessComponent<INDEX + 1, ComponentArgs ...>( component, componentType, tupleToFill );
-			}
+			}*/
 
+			return true;
 
 		}
 
