@@ -1,19 +1,12 @@
 #ifndef ECS_H
 #define ECS_H
 
-#include "IEntity.h"
-#include "Entity.h"
-#include "EntityManager.h"
-
-#include "IComponent.h"
-#include "Component.h"
-#include "ComponentManager.h"
-
-#include "ISystem.h"
-#include "System.h"
-#include "SystemManager.h"
-
-#include "ComponentTypes.h"
+#include "include/ECS_Definitions.h"
+#include "include/Utility/CompilerHash.h"
+#include "include/EntityManager.h"
+#include "include/ComponentManager.h"
+#include "include/SystemManager.h"
+#include "include/System.h"
 
 
 #endif // !ECS_H

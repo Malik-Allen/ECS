@@ -1,119 +1,86 @@
 #include "ECS/ECS.h"
 
-#include <iostream>
-#include <string>
 
-#include <vector>
-
-
-class Object : public ECS::Entity {
-
-public:
-
-	Object() {}
-	~Object() {}
-
-};
 
 class AudioComponent : public ECS::Component {
 
+	static constexpr uint32_t ID = COMPILE_TIME_CRC32_STR( "AudioComponent" );
 public:
 
-	AudioComponent() : ECS::Component( Component_Type::AudioComponent ) {}
+	AudioComponent() : Component(ID) {}
 	~AudioComponent() {}
 
-	void Play() {
-		std::cout << "The World Is Yours!" << std::endl;
-	}
+	
 
 };
 
 class PhysicsComponent : public ECS::Component
 {
-
+	static constexpr uint64_t ID = COMPILE_TIME_CRC32_STR( "PhysicsComponent" );
 public:
 
-	PhysicsComponent() : ECS::Component( Component_Type::PhysicsComponent ) {}
+	PhysicsComponent() : Component(ID) {}
 	~PhysicsComponent() {}
 
-	void Run()
-	{
-		std::cout << "Every Action has a equal and opposite reaction!" << std::endl;
-	}
-
 };
 
-class AudioSystem : public ECS::System<AudioComponent> {
 
-	using BaseType = System<AudioComponent>;
+class PhysicsSystem : public ECS::System<PhysicsComponent, AudioComponent, PhysicsComponent>
+{
 
 public:
 
-	AudioSystem(ECS::EntityManager* entityManager) : System(entityManager) {}
-	~AudioSystem() {}
+	PhysicsSystem() {}
+	~PhysicsSystem() {}
 
-	virtual void Update(float deltaTime) override {
-
-		for (auto& component : m_components) {
-
-			component->Play();
-		}
+	virtual void Update( float deltaTime )
+	{
 
 	}
 
-	
 };
+
 
 
 int main(int args, char* argv[]) {
 
 	
 	ECS::EntityManager* entityManager = new ECS::EntityManager();	
-	ECS::ComponentManager* componentManager = new ECS::ComponentManager();
 	ECS::SystemManager* systemManager = new ECS::SystemManager();
+	ECS::ComponentManager* componentManager = new ECS::ComponentManager(entityManager, systemManager);
 
-	entityManager->AssignComponentManager( componentManager );
-	componentManager->AssignSystemManager( systemManager );
-	systemManager->AssignEntityManager( entityManager );
+	ECS::EntityId id = entityManager->CreateEntity();
 
-	AudioSystem* audioSystem = systemManager->AddSystem<AudioSystem>();
+	systemManager->RegisterSystem<PhysicsSystem>();
 
-	ECS::EntityId entityId = entityManager->CreateEntity<Object>();
+	PhysicsComponent* physicsComponent = componentManager->AddComponent<PhysicsComponent>( id );
 
-	std::cout << "Current EntityId: " << entityId << std::endl;
+	return 0;
 
-	AudioComponent* audio = entityManager->GetEntity(entityId)->AddComponent<AudioComponent>();
+	physicsComponent = componentManager->AddComponent<PhysicsComponent>( id );
 
-	std::cout << "Component Id: " << audio->GetComponentId() << " Component OwnerId: " << audio->GetOwnerId() << std::endl;
+	// std::cout << physicsComponent->m_componentType << std::endl;
 
-	
+	physicsComponent = componentManager->AddComponent<PhysicsComponent>( id );
 
-	
-	PhysicsComponent* physics = entityManager->GetEntity( entityId )->AddComponent<PhysicsComponent>();
-	std::cout << "Component Id: " << physics->GetComponentId() << " Component OwnerId: " << physics->GetOwnerId() << std::endl;
+	componentManager->RemoveComponent<PhysicsComponent>( id );
+	componentManager->RemoveComponent<PhysicsComponent>( id );
+	componentManager->RemoveComponent<PhysicsComponent>( id );
 
-	entityManager->GetEntity( entityId )->RemoveComponent<PhysicsComponent>( physics->GetComponentId() );
-
-	/*if ( dynamic_cast<PhysicsComponent*>(audio) )
+	componentManager->AddComponent<AudioComponent>( id );
+	for ( int i = 0; i < 23; i++ )
 	{
-		audio->Play();
+		componentManager->AddComponent<PhysicsComponent>( id );
 	}
-	else
+
+	for ( int i = 0; i < 12; ++i )
 	{
-		physics->Run();
-	}*/
-
-	systemManager->Update( 0.0f );
-	systemManager->Update( 0.0f );
+		componentManager->RemoveComponent<PhysicsComponent>( id );
+	}
 
 
-	entityManager->DestroyEntity(entityId);
-
-
-
-	delete entityManager, entityManager = nullptr;
-
-	delete componentManager, componentManager = nullptr;
+	componentManager->RemoveComponent<AudioComponent>( id );
+	// componentManager->RemoveComponent<PhysicsComponent>( id );
 
 
 	return 0;
