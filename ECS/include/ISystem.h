@@ -7,9 +7,17 @@ namespace ECS {
 	class ISystem
 	{
 
+		friend class SystemManager;
+
+		// Unique Identifier Managed by the SystemManager
+		uint64_t		m_systemManagerId;
+
+		// Unique Identifier Managed by the SystemManager
+		uint64_t		m_systemId;
+
 	public:
 
-		ISystem() {}
+		explicit ISystem(uint64_t systemID) : m_systemManagerId(0), m_systemId(systemID) {}
 		virtual ~ISystem() {}
 
 		virtual void Update(float deltaTime) = 0;

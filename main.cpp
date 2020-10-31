@@ -4,8 +4,8 @@
 
 class AudioComponent : public ECS::Component {
 
-	static constexpr uint32_t ID = COMPILE_TIME_CRC32_STR( "AudioComponent" );
 public:
+	static constexpr uint32_t ID = COMPILE_TIME_CRC32_STR( "AudioComponent" );
 
 	AudioComponent() : Component(ID) {}
 	~AudioComponent() {}
@@ -14,10 +14,23 @@ public:
 
 };
 
+class RenderComponent : public ECS::Component {
+
+public:
+	static constexpr uint32_t ID = COMPILE_TIME_CRC32_STR("RenderComponent");
+
+	RenderComponent() : Component(ID) {}
+	~RenderComponent() {}
+
+
+
+};
+
+
 class PhysicsComponent : public ECS::Component
 {
-	static constexpr uint64_t ID = COMPILE_TIME_CRC32_STR( "PhysicsComponent" );
 public:
+	static constexpr uint64_t ID = COMPILE_TIME_CRC32_STR( "PhysicsComponent" );
 
 	PhysicsComponent() : Component(ID) {}
 	~PhysicsComponent() {}
@@ -25,16 +38,53 @@ public:
 };
 
 
-class PhysicsSystem : public ECS::System<PhysicsComponent, AudioComponent, PhysicsComponent>
+class PhysicsSystem : public ECS::System<PhysicsComponent, AudioComponent>
 {
 
 public:
 
-	PhysicsSystem() {}
+	static constexpr uint64_t ID = COMPILE_TIME_CRC32_STR("PhysicsSystem");
+
+	PhysicsSystem() : System(ID) {}
 	~PhysicsSystem() {}
 
 	virtual void Update( float deltaTime )
 	{
+
+		for (const auto& c : m_components) {
+
+			PhysicsComponent* physicsComponent = std::get<PhysicsComponent*>(c);
+
+			if (physicsComponent) {
+				std::cout << "The world id yours!" << std::endl;
+			}
+		}
+
+	}
+
+};
+
+class AudioSystem : public ECS::System<AudioComponent>
+{
+
+public:
+
+	static constexpr uint64_t ID = COMPILE_TIME_CRC32_STR("AudioSystem");
+
+	AudioSystem() : System(ID) {}
+	~AudioSystem() {}
+
+	virtual void Update(float deltaTime)
+	{
+
+		for (const auto& c : m_components) {
+
+			AudioComponent* AUDIOCOMPONENT = std::get<AudioComponent*>(c);
+
+			if (AUDIOCOMPONENT) {
+				std::cout << "Mustard on that beat hoe!" << std::endl;
+			}
+		}
 
 	}
 
@@ -49,38 +99,75 @@ int main(int args, char* argv[]) {
 	ECS::SystemManager* systemManager = new ECS::SystemManager();
 	ECS::ComponentManager* componentManager = new ECS::ComponentManager(entityManager, systemManager);
 
-	ECS::EntityId id = entityManager->CreateEntity();
-
+	systemManager->RegisterSystem<AudioSystem>();
 	systemManager->RegisterSystem<PhysicsSystem>();
 
-	PhysicsComponent* physicsComponent = componentManager->AddComponent<PhysicsComponent>( id );
+	for (int i = 1; i <= 1000; i++) {
 
-	return 0;
+		std::cout << "New Entity with Id: " << entityManager->CreateEntity() << std::endl;
 
-	physicsComponent = componentManager->AddComponent<PhysicsComponent>( id );
-
-	// std::cout << physicsComponent->m_componentType << std::endl;
-
-	physicsComponent = componentManager->AddComponent<PhysicsComponent>( id );
-
-	componentManager->RemoveComponent<PhysicsComponent>( id );
-	componentManager->RemoveComponent<PhysicsComponent>( id );
-	componentManager->RemoveComponent<PhysicsComponent>( id );
-
-	componentManager->AddComponent<AudioComponent>( id );
-	for ( int i = 0; i < 23; i++ )
-	{
-		componentManager->AddComponent<PhysicsComponent>( id );
 	}
 
-	for ( int i = 0; i < 12; ++i )
+	for (int i = 1; i <= 1000; i++) {
+
+		componentManager->AddComponent<AudioComponent>(i);
+		componentManager->AddComponent<PhysicsComponent>(i);
+			
+	}
+	systemManager->UnregisterSystem<AudioSystem>();
+	systemManager->Update(0.0f);
+
+	for (int i = 1; i <= 1000; i++)
 	{
-		componentManager->RemoveComponent<PhysicsComponent>( id );
+		componentManager->RemoveComponent<PhysicsComponent>(i);
+		componentManager->RemoveAllComponents(i);
+
+	}
+	std::cout << "Yelling!" << std::endl;
+
+	systemManager->Update(0.0f);
+
+	for (int i = 1; i <= 1000; i++) {
+
+		componentManager->RemoveAllComponents(i);
+		entityManager->DestroyEntity(i);
+
 	}
 
+	std::cout << "Testing!" << std::endl;
 
-	componentManager->RemoveComponent<AudioComponent>( id );
+	
+
+	systemManager->Update(1.0f);
+	
+	std::cout << "Complete!" << std::endl;
+
+	// componentManager->AddComponent<RenderComponent>( id );
+	// componentManager->AddComponent<PhysicsComponent>(id);
+	// componentManager->AddComponent<AudioComponent>(id);
+
+	// 
+
+	// componentManager->RemoveComponent<PhysicsComponent>(id);
+	
+	// systemManager->Update(0.0f);
+
+	// physicsComponent = componentManager->AddComponent<PhysicsComponent>( id );
+
+	// componentManager->AddComponent<AudioComponent>(id);
+	// physicsComponent = componentManager->AddComponent<PhysicsComponent>( id );
+	
+
+	// return 0;
 	// componentManager->RemoveComponent<PhysicsComponent>( id );
+	// componentManager->RemoveComponent<PhysicsComponent>( id );
+	// componentManager->RemoveComponent<PhysicsComponent>( id );
+
+	
+
+
+	
+	
 
 
 	return 0;

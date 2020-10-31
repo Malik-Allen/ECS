@@ -5,25 +5,33 @@
 
 namespace ECS {
 
-
+	
 	class Component {
 		
 
 		friend class ComponentManager;
 		
+		// The owning entity's id
+		EntityId				m_ownerId;
 
-		EntityId m_ownerId;
+		// The unique identier for this component
+		ComponentId				m_componentId;
 
-		ComponentId m_componentId;
+		// The unique identier for this component, used only by the component manager
+		uint64_t				m_componentManagerId;
 
-		uint64_t m_componentType;
+		// This component's unique type identifier
+		uint64_t				m_componentType;
+
 
 	public:
 
 
-		explicit Component(uint64_t componentType) : m_ownerId(0), m_componentId(0), m_componentType( componentType ) {}
+		explicit Component(uint64_t componentType) : m_ownerId(0), m_componentId(0), m_componentManagerId(0), m_componentType( componentType ) {}
 
 		virtual ~Component() {}
+
+		const EntityId& GetOwnerEntity() const { return m_ownerId; }
 
 		const ComponentId& GetComponentId() const { return m_componentId; }
 

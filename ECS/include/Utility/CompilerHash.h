@@ -1,6 +1,7 @@
 #ifndef COMPILERHASH_H
 #define COMPILERHASH_H
 
+// Compile Time String Hashing, thank you to @tower120 & @redwizard792
 // https://stackoverflow.com/questions/2111667/compile-time-string-hashing
 
 static constexpr unsigned int crc_table[256] = {

@@ -18,111 +18,117 @@ namespace ECS {
 	class System : public ISystem
 	{
 		friend class SystemManager;
-		
-		using ComponentType = std::tuple< Components ... >;
 
 		using ComponentTuple = std::tuple< Components* ... >;
 
-		template<size_t N>
-		using Nth = typename std::tuple_element<N, ComponentType>::type;;
-		// using Nth = decltype( std::get<N>( std::declval<Component>() ) );
-		
 	protected:
 
-		std::vector<ComponentTuple> m_components;
+		// The list of Component Tuples, where each tuple is a set of components owned by the same entity
+		std::vector<ComponentTuple>			m_components;
 
 	public:
 
-		System() {}
+		explicit System(uint64_t systemId) : ISystem(systemId) {}
 		virtual ~System() {}
 
 		virtual void Update( float deltaTime ) override {}
 
+		// If the passed entity's components match this system's signature, the components will be added to this system
+		// If not, then we check to see if any of the entity's components are in the system and remove them
 		virtual void OnEntitySignatureChanged( const Entity& entity ) override final
 		{
-			
-			// ComponentTuple componentTuple = std::make_tuple( std::forward<Components( Components* )... );
 
-			int size = sizeof...( Components );
+			int NumberOfComponents = sizeof...( Components );
+			int NumberOfMatchingComponents = 0;
 
-			Component* c = nullptr;
-			c = new Nth<0>();
-
-			std::cout << "Component Type: " << c->GetComponentType() << std::endl;
-
-			delete c;
-
-			c = new Nth<1>();
-
-			std::cout << "Component Type: " << c->GetComponentType() << std::endl;
-
-			delete c;
-
-			c = new Nth<2>();
-
-			std::cout << "Component Type: " << c->GetComponentType() << std::endl;
-				 
-
-
-			// std::cout << "Test: " << Nth<2>  << std::endl;
-
-
-			std::cout << "Tuple Size: " << sizeof...(Components) << std::endl;
-			ComponentTuple cTuple;
-			int matchComponent = 0;
-			for ( auto* c : entity.GetComponents() )
+			ComponentTuple componentTuple;
+			for ( auto* c : entity.GetComponents() )	// For all the components on the entity
 			{
 				if ( c != nullptr )
 				{
-					std::cout << "Valid Component With Id: " << c->GetComponentId() << std::endl;
+					
+					if (ProcessEntityComponent<0, Components ...>(c, componentTuple)) 
+						// When a component matches any of the acceptable types of component for this system
+						// Increment the number of matching components
+					{		
+						++NumberOfMatchingComponents;
 
-					if ( ProcessComponent<0, Components* ...>( c, 0, cTuple ) )
-					{
+						
+						if (NumberOfMatchingComponents == NumberOfComponents) {
+							// Add the created tuple to this system 
+							m_components.push_back(componentTuple);
+							break;
+						}
 
 					}
 
-
+				}
+				else // The moment we find a null component, we now we are at the end of the array, no need to continue
+				{
+					break;
 				}
 
 			}
 
-			// Loop through the component tuples
+			if (NumberOfMatchingComponents != NumberOfComponents) {	
+				// If this entity'components do not match this system, lets look to see if the entity's components are already in the system
 
+				for (size_t i = 0; i < m_components.size(); i++) {
 
+					Component* c = std::get<0>(m_components[i]);
+
+					if (c->GetOwnerEntity() == entity.GetId()) {
+
+						m_components[i] = m_components[m_components.size() - 1];
+						m_components.pop_back();
+						break;
+
+					}
+				}
+
+			}
+
+			// Loop through the component tuple
 
 		}
 
-		
-		template<size_t INDEX, class ComponentClass, class ... ComponentArgs>
-		bool ProcessComponent( Component* component, const uint64_t& componentType, ComponentTuple& tupleToFill )
+	private:
+
+		// Checks to see if the passed Component's Type matches the type of component type required for this system
+		// If true, returns true, otherwise recursively checks the passed component's type agains all acceptable component types
+		// If there is no match returns false
+		template<size_t INDEX, class ComponentClass /*Current Component Class*/, class ... Components>
+		bool ProcessEntityComponent( Component* component, ComponentTuple& tupleToFill) 
 		{
+			
 			// Complile-time check to see if class T can be converted to class B, 
 				// valid for derivation check of class T from class B
-			// CanConvert_From<ComponentClass, Component>();
+			CanConvert_From<ComponentClass, Component>();
 
-			/*if ( component->GetComponentType() == componentType )
-			{
-				std::get<INDEX>( tupleToFill ) = dynamic_cast<ComponentClass*>(component);
+			if (ComponentClass::ID == component->GetComponentType()) {
+
+				std::get<INDEX>(tupleToFill) = dynamic_cast<ComponentClass*>(component);
 				return true;
 
 			}
-			else
-			{
-				return ProcessComponent<INDEX + 1, ComponentArgs ...>( component, componentType, tupleToFill );
-			}*/
-
-			return true;
+			else {
+				// We drop the ComponentClass with each loop of recursion
+				// When we run out of ComponentClasses to check, we return false, via the recursive ender
+				return ProcessEntityComponent<INDEX + 1, Components ... >(component, tupleToFill);
+			}
 
 		}
-
+		
 
 		template<size_t INDEX>
-		bool ProcessComponent( const Component& component, const uint64_t& componentType, ComponentTuple& tupleToFill )
-		{
+		bool ProcessEntityComponent(Component* component, ComponentTuple& tupleToFill) {
 			return false;
 		}
+		
 
 	};
+
+	
 
 }
 

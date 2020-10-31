@@ -12,11 +12,17 @@ namespace ECS
 	{
 		friend class ComponentManager;
 
+		// The entities created by this Entity Manager
 		std::map<EntityId, Entity*>    m_entities;
 
-		// TODO: Make an linked-listed of Entities that are pending a clean up, Create a System to clear out these Entities on a schedule
+		// The number of entities in this entity manager
+		uint32_t					m_entityCounter;
 
-		uint32_t m_entityCounter;
+		// TODO: 
+		// Make an list of Entities that are pending a clean up, Create a System to clear out these Entities on a schedule
+			// Instead of deleting them right away
+
+		
 
 	public:
 
@@ -24,9 +30,13 @@ namespace ECS
 
 		~EntityManager() {}
 
-		// Creates an Entity, returns an EntityId
+		// Creates an Entity, returns an EntityId, returns 0 if the entity was not created
 		EntityId CreateEntity()
 		{
+			if (m_entityCounter > MAX_ENTITIES) {
+				// Some Debug
+				return 0;
+			}
 
 			Entity* entity = new Entity();
 
