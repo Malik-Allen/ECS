@@ -7,6 +7,11 @@ namespace ECS {
 	class ISystem
 	{
 
+		ISystem(const ISystem&) = delete;
+		ISystem& operator=(const ISystem&) = delete;
+		ISystem(ISystem&&) = delete;
+		ISystem& operator=(ISystem&&) = delete;
+
 		friend class SystemManager;
 
 		// Unique Identifier Managed by the SystemManager

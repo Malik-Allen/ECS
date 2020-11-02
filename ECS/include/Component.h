@@ -8,6 +8,10 @@ namespace ECS {
 	
 	class Component {
 		
+		Component(const Component&) = delete;
+		Component& operator=(const Component&) = delete;
+		Component(Component&&) = delete;
+		Component& operator=(Component&&) = delete;
 
 		friend class ComponentManager;
 		

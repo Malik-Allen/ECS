@@ -3,6 +3,10 @@
 
 #include <cstdint>
 
+#include "Utility/CompilerHash.h"
+
+#define GENERATE_ID(y) (COMPILE_TIME_CRC32_STR(y))
+
 namespace ECS {
 
 	using EntityId =  uint64_t;
@@ -16,8 +20,6 @@ namespace ECS {
 	static constexpr size_t MAX_SYSTEMS	{ 1000 };
 
 	static constexpr size_t MAX_COMPONENTS	{ MAX_ENTITIES * MAX_COMPONENTS_PER_ENTITY };
-
-	struct AutoComponentIdCounter {};
 
 }
 

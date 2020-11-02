@@ -33,6 +33,8 @@ namespace ECS {
 
 		virtual void Update( float deltaTime ) override {}
 
+	private:
+
 		// If the passed entity's components match this system's signature, the components will be added to this system
 		// If not, then we check to see if any of the entity's components are in the system and remove them
 		virtual void OnEntitySignatureChanged( const Entity& entity ) override final
@@ -55,6 +57,24 @@ namespace ECS {
 
 						
 						if (NumberOfMatchingComponents == NumberOfComponents) {
+
+							// TODO:
+							// Make sure this entity's Components do not already exist on this system before adding them
+							// Instead if they do exist remove them
+							// This can end up being a lot of looping!
+							for (size_t i = 0; i < m_components.size(); i++) {
+
+								Component* c = std::get<0>(m_components[i]);
+
+								if (c->GetOwnerEntity() == entity.GetId()) {
+
+									m_components[i] = m_components[m_components.size() - 1];
+									m_components.pop_back();
+									break;
+
+								}
+							}
+
 							// Add the created tuple to this system 
 							m_components.push_back(componentTuple);
 							break;

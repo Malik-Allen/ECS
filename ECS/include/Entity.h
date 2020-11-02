@@ -10,6 +10,11 @@ namespace ECS
 
 	struct Entity
 	{
+
+		Entity(const Entity&) = delete;
+		Entity& operator=(const Entity&) = delete;
+		Entity(Entity&&) = delete;
+		Entity& operator=(Entity&&) = delete;
 		
 		Entity() : m_entityId( 0 ), m_componentCounter( 0 ), m_components() {}
 		~Entity() {}	

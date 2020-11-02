@@ -5,7 +5,7 @@
 class AudioComponent : public ECS::Component {
 
 public:
-	static constexpr uint32_t ID = COMPILE_TIME_CRC32_STR( "AudioComponent" );
+	static constexpr uint32_t ID = GENERATE_ID( "AudioComponent" );
 
 	AudioComponent() : Component(ID) {}
 	~AudioComponent() {}
@@ -17,7 +17,7 @@ public:
 class RenderComponent : public ECS::Component {
 
 public:
-	static constexpr uint32_t ID = COMPILE_TIME_CRC32_STR("RenderComponent");
+	static constexpr uint32_t ID = GENERATE_ID("RenderComponent");
 
 	RenderComponent() : Component(ID) {}
 	~RenderComponent() {}
@@ -30,7 +30,7 @@ public:
 class PhysicsComponent : public ECS::Component
 {
 public:
-	static constexpr uint64_t ID = COMPILE_TIME_CRC32_STR( "PhysicsComponent" );
+	static constexpr uint64_t ID = GENERATE_ID( "PhysicsComponent" );
 
 	PhysicsComponent() : Component(ID) {}
 	~PhysicsComponent() {}
@@ -43,7 +43,7 @@ class PhysicsSystem : public ECS::System<PhysicsComponent, AudioComponent>
 
 public:
 
-	static constexpr uint64_t ID = COMPILE_TIME_CRC32_STR("PhysicsSystem");
+	static constexpr uint64_t ID = GENERATE_ID("PhysicsSystem");
 
 	PhysicsSystem() : System(ID) {}
 	~PhysicsSystem() {}
@@ -69,7 +69,7 @@ class AudioSystem : public ECS::System<AudioComponent>
 
 public:
 
-	static constexpr uint64_t ID = COMPILE_TIME_CRC32_STR("AudioSystem");
+	static constexpr uint64_t ID = GENERATE_ID("AudioSystem");
 
 	AudioSystem() : System(ID) {}
 	~AudioSystem() {}
@@ -82,7 +82,7 @@ public:
 			AudioComponent* AUDIOCOMPONENT = std::get<AudioComponent*>(c);
 
 			if (AUDIOCOMPONENT) {
-				std::cout << "Mustard on that beat hoe!" << std::endl;
+				std::cout << "Hello World!" << std::endl;
 			}
 		}
 
