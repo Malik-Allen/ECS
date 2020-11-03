@@ -2,9 +2,8 @@
 #define ECS_H
 
 #include "include/ECS_Definitions.h"
-#include "include/EntityManager.h"
-#include "include/ComponentManager.h"
-#include "include/SystemManager.h"
+#include "include/World.h"
+#include "include/Component.h"
 #include "include/System.h"
 
 

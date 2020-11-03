@@ -25,7 +25,8 @@ namespace ECS {
 	public:
 
 		SystemManager() : m_activeSystems(), m_systemsCounter( 0 ) {}
-		~SystemManager() {}
+		
+		~SystemManager() { UnregisterAllSystems(); }
 
 
 		// Add a System to this System Manager
@@ -107,6 +108,8 @@ namespace ECS {
 
 		}
 
+		
+
 		// Calls Update on all active systems, inside of this system manager
 		void Update( float deltaTime )
 		{
@@ -139,6 +142,25 @@ namespace ECS {
 
 			}
 
+
+		}
+
+		// Unregisters all systems
+		void UnregisterAllSystems()
+		{
+
+			for (auto* s : m_activeSystems) {
+
+				if (s != nullptr)
+				{
+
+					delete s, s = nullptr;
+
+				}
+
+			}
+
+			m_activeSystems.empty();
 
 		}
 

@@ -5,6 +5,12 @@
 #include "ComponentManager.h"
 #include "SystemManager.h"
 
+#include "Utility/TemplateHelper.h"
+
+#include <vector>
+
+#include <iostream>
+
 namespace ECS {
 
 	// User's Manual:
@@ -22,19 +28,20 @@ namespace ECS {
 		// DLL Notes:
 		// Create a Create World Fucntion to return a new ECS::World()
 
-		// EntityManager*		m_enityManager;
+		EntityManager*		m_enityManager;
 
-		// ComponentManager*	m_componentManager;
+		SystemManager*		m_systemManager;
 
-		// SystemManager*		m_systemManager;
+		ComponentManager*	m_componentManager;
+
 
 	public:
 
 		// Constructs ECS system
-		World() {}
+		World();
 
 		// Cleans and deletes ecs system
-		~World() {}		// OnDestroy()
+		~World();		
 
 		// OnCreate() 
 			// Create Entity, Component and System Managers
@@ -45,39 +52,105 @@ namespace ECS {
 			// Calling clean up and finallly deleting memory
 
 
+		// Will create 'n' number of entities with the passed components added to it, Returns vector of the entityIds
+		template<class ... Components>
+		std::vector<EntityId> CreateEntitiesWithComponents(uint64_t numberOfEntities)
+		{
+			std::cout << "Creating " << numberOfEntities << " entities..." << std::endl;
+			std::vector<EntityId> createdEntities;
+			EntityId currentEntityId = 0;
+			for (int i = 0; i < numberOfEntities; i++)
+			{
+				currentEntityId = m_enityManager->CreateEntity();
 
-		// CreateEntityWithComponents<... Components>(int numberOfEntities)
-			// Will create 'n' number of entities with the passed components added to it
-			// (Potentially) At the cost of no constructor parameters for individual components... 
-			// Returns vector of the entityIds
+				std::cout << "Current Iteration: " << i << std::endl;
+				std::cout << "Current EntityId: " << currentEntityId << std::endl;
+
+				if (currentEntityId != 0)	
+					// A valid Entity Id is a non-zero number, therefore add components to valid entities
+				{
+					
+					AddNewComponentToEntity< 0 , Components ... >(currentEntityId);
+
+					createdEntities.push_back(currentEntityId);
+
+				}
+
+			}
+
+			return createdEntities;
+
+		}
+
+		// Destroys Entity with the passed EntityId, removing all components in the process
+		void DestroyEntity(EntityId entityId) 
+		{
+			m_componentManager->RemoveAllComponents(entityId);
+			m_enityManager->DestroyEntity(entityId);
+		}
 
 		// GetAllEntitiesWithComponents< ... Components>()
 			// Returns a vector of entity ids, that have the components passed
 
-		// DestroyEntity(EntityId Id)
-			// Destroys entity with that id
+
+		// Adds Component to entity with passed EntityId
+		template<typename T>
+		T* AddComponentToEntity(EntityId entityId)
+		{
+			return m_componentManager->AddComponent<T>(entityId);
+		}
+
+		// Removes component from entity with passed EntityId, if Component exists on entity
+		template<typename T>
+		void RemoveComponentFromEntity(EntityId entityId)
+		{
+			m_componentManager->RemoveComponent<T>(entityId);
+		}
 
 
+		// Registers Systems, inside of system manager
+		template<typename T>
+		T* RegisterSystem()
+		{
+			return m_systemManager->RegisterSystem<T>();
+		}
 
-		// AddComponentToEntity<class Component>(EntityId, ComponentConstrutor Parameters)
-			// Adds component to entity with passed id
-			// Returns the Reference to the component
+		// Unregisters system from system manager
+		template<typename T>
+		void UnregisterSystem()
+		{
+			m_systemManager->UnregisterSystem<T>();
+		}
 
-		// RemoveComponentFromEntity<class Component>(EntityId)
-			// Removes component from the entity with the passed id
+		// Update World Systems
+		void Update(float deltaTime)
+		{
+			m_systemManager->Update(deltaTime);
+		}
+
+	private:
+
+		
+		// Recursively adds components to the entity with the passed id
+		template<size_t INDEX, typename ComponentClass, typename ... Components>
+		void AddNewComponentToEntity(EntityId entityId)
+		{
+			// Complile-time check to see if class T can be converted to class B, 
+				// valid for derivation check of class T from class B
+			CanConvert_From<ComponentClass, Component>();
+
+			std::cout << "Adding Component to Entity: " << entityId << std::endl;
+			if (m_componentManager->AddComponent<ComponentClass>(entityId) != nullptr)
+				// When we successfully add a component, carry on with the process
+			{
+				AddNewComponentToEntity< INDEX + 1, Components ... >(entityId);
+			}
 
 
+		}
 
-
-		// RegisterSystem<class System>()
-			// Registers system inside of system manager
-			// Returns a pointer to the system that was created
-
-		// UnRegisterSystem<class System>()
-			// Unregisters system inside of system manager if it exists
-
-		// Update(float delta)
-			// Updates all systems within the world
+		template<size_t INDEX>
+		void AddNewComponentToEntity(EntityId entityId) { std::cout << "Completed Adding Components to Entity: " << entityId << std::endl; }
 
 
 	};

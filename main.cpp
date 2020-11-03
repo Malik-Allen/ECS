@@ -23,7 +23,6 @@ public:
 	~RenderComponent() {}
 
 
-
 };
 
 
@@ -139,9 +138,28 @@ int main(int args, char* argv[]) {
 	
 
 	systemManager->Update(1.0f);
-	
+
 	std::cout << "Complete!" << std::endl;
 
+	ECS::World* world1 = new ECS::World();
+
+	world1->RegisterSystem<PhysicsSystem>();
+
+	std::vector<ECS::EntityId> worldEntities = world1->CreateEntitiesWithComponents<PhysicsComponent, AudioComponent>(1000);
+
+	if (world1->AddComponentToEntity<RenderComponent>(256) != nullptr)
+	{
+		std::cout << "We made it!" << std::endl;
+	}
+
+	world1->RemoveComponentFromEntity<RenderComponent>(256);
+
+	world1->Update(0.0f);
+
+	delete world1;
+	world1 = nullptr;
+
+	std::cout << "Completed World Process!" << std::endl;
 	// componentManager->AddComponent<RenderComponent>( id );
 	// componentManager->AddComponent<PhysicsComponent>(id);
 	// componentManager->AddComponent<AudioComponent>(id);

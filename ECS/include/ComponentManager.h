@@ -48,7 +48,7 @@ namespace ECS
 			m_systemManager( systemManager )
 		{}
 
-		~ComponentManager() {}
+		~ComponentManager() { RemoveAllComponentsOnManager(); }
 
 
 		// Add Component to Entity with the Id, returns created Component, returns fall if entity does not exist
@@ -99,8 +99,11 @@ namespace ECS
 			// Also add a reference of this component to the ComponentMap
 			m_componentMap[T::ID].push_back( component );	
 
-			// This entity's signature has now changed update the system manager's systems
-			m_systemManager->OnEntitySignatureChanged( *entity );
+			if (m_systemManager) {
+				// This entity's signature has now changed update the system manager's systems
+				m_systemManager->OnEntitySignatureChanged(*entity);
+			}
+			
 			
 			return component;
 
@@ -210,6 +213,23 @@ namespace ECS
 
 	private:
 
+		void RemoveAllComponentsOnManager()
+		{
+			for (size_t i = 0; i < m_components.size(); i++)
+			{
+
+				if (m_components[i] != nullptr)
+				{
+					delete m_components[i];
+					m_components[i] = nullptr;
+				}
+
+			}
+
+			m_componentMap.clear();
+		}
+
+
 		// Utility function for the ComponentManager to remove components given their component type
 		void RemoveComponent(const Entity& entity, const uint64_t& componentType) 
 		{
@@ -246,8 +266,11 @@ namespace ECS
 						m_components[componentId]->m_componentManagerId = componentId;
 					}
 
-					// Update systems, now that we have removed a component from this entity
-					m_systemManager->OnEntitySignatureChanged(entity);
+					if (m_systemManager) {
+						// Update systems, now that we have removed a component from this entity
+						m_systemManager->OnEntitySignatureChanged(entity);
+					}
+					
 
 					// Finally delete the component
 					// TODO: Add it to scheduled garbage collection
