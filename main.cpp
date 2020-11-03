@@ -18,11 +18,11 @@ class RenderComponent : public ECS::Component {
 
 public:
 	static constexpr uint32_t ID = GENERATE_ID("RenderComponent");
-
-	RenderComponent() : Component(ID) {}
+	RenderComponent() : Component( ID ), receivedTime( 0.0f ) {}
+	RenderComponent(float timeStamp) : Component(ID), receivedTime(timeStamp) {}
 	~RenderComponent() {}
 
-
+	float receivedTime;
 };
 
 
@@ -63,7 +63,7 @@ public:
 
 };
 
-class AudioSystem : public ECS::System<AudioComponent>
+class AudioSystem : public ECS::System<AudioComponent, RenderComponent>
 {
 
 public:
@@ -83,6 +83,10 @@ public:
 			if (AUDIOCOMPONENT) {
 				std::cout << "Hello World!" << std::endl;
 			}
+
+			RenderComponent* RENDERCOMPONENT = std::get<RenderComponent*>( c );
+
+			std::cout << "Received Time: " << RENDERCOMPONENT->receivedTime << std::endl;
 		}
 
 	}
@@ -111,14 +115,16 @@ int main(int args, char* argv[]) {
 
 		componentManager->AddComponent<AudioComponent>(i);
 		componentManager->AddComponent<PhysicsComponent>(i);
+		componentManager->AddComponent<RenderComponent>( i, 15.0f );
 			
 	}
-	systemManager->UnregisterSystem<AudioSystem>();
+	/*systemManager->UnregisterSystem<AudioSystem>();*/
 	systemManager->Update(0.0f);
 
 	for (int i = 1; i <= 1000; i++)
 	{
 		componentManager->RemoveComponent<PhysicsComponent>(i);
+		
 		componentManager->RemoveAllComponents(i);
 
 	}
@@ -143,16 +149,18 @@ int main(int args, char* argv[]) {
 
 	ECS::World* world1 = new ECS::World();
 
-	world1->RegisterSystem<PhysicsSystem>();
+	world1->RegisterSystem<AudioSystem>();
 
 	std::vector<ECS::EntityId> worldEntities = world1->CreateEntitiesWithComponents<PhysicsComponent, AudioComponent>(1000);
 
-	if (world1->AddComponentToEntity<RenderComponent>(256) != nullptr)
+	for ( size_t i = 0; i < worldEntities.size(); i++ )
 	{
-		std::cout << "We made it!" << std::endl;
+
+		world1->AddComponentToEntity<RenderComponent>( worldEntities[i], 30.0f );
+
 	}
 
-	world1->RemoveComponentFromEntity<RenderComponent>(256);
+	// world1->RemoveComponentFromEntity<RenderComponent>(256);
 
 	world1->Update(0.0f);
 
