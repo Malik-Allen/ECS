@@ -18,7 +18,7 @@ class RenderComponent : public ECS::Component {
 
 public:
 	static constexpr uint32_t ID = GENERATE_ID("RenderComponent");
-	RenderComponent() : Component( ID ), receivedTime( 0.0f ) {}
+	// RenderComponent() : Component( ID ), receivedTime( 0.0f ) {}
 	RenderComponent(float timeStamp) : Component(ID), receivedTime(timeStamp) {}
 	~RenderComponent() {}
 

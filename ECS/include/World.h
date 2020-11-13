@@ -15,13 +15,14 @@ namespace ECS
 {
 
 // User's Manual:
-// 1. Through a world reference you will be able to call the below functionality
+// 1. Through a world reference you will be able access the functionality of this Entity Component System
 // 2. So the only way to access the ecs is via the world, which will make sure everything is allocated, managed, and deleted correctly
-// 3. You can store your entityIds, component references how ever you please, no deletes of components or of systems allowed
+// 3. You can store your entityIds, component references however you please, no deletes of components or of systems allowed
 // 4. Every component on an entity must be unique, meaning: Multiple components of the same type on a single entity is currently not supported
-// 5. Every System must be unique, meaning: Multiple Systems of the same type/class being registered is currently not supported
+// 5. Every System must be unique, meaning : Multiple Systems of the same type / class being registered is currently not supported
 // 6. Every Component class must have a public static constexpr uint32_t ID = GENERATE_ID( "EXAMPLE_Component" );
 // 7. Every System class must have public static constexpr uint32_t ID = GENERATE_ID( "EXAMPLE_System" );
+
 
 	class World
 	{
@@ -72,13 +73,26 @@ namespace ECS
 			}
 		}
 
-		// OnCreate() 
-			// Create Entity, Component and System Managers
-			// Called in constructor
+		// Will create the number of entities passed, given that you do not exceed entity limits
+		std::vector<EntityId> CreateEntities( uint64_t numberOfEntities )
+		{
+			std::vector<EntityId> createdEntities;
+			EntityId currentEntityId;
 
-		// OnDestroy()
-			// Destroys all entities, components and systems inside of this world's managers
-			// Calling clean up and finallly deleting memory
+			for ( int i = 0; i < numberOfEntities; i++ )
+			{
+				currentEntityId = m_enityManager->CreateEntity();
+
+				if ( currentEntityId != 0 )
+					// A valid Entity Id is a non-zero value
+				{
+					createdEntities.push_back( currentEntityId );
+				}
+				
+			}
+
+			return createdEntities;
+		}
 
 
 		// Will create 'n' number of entities with the passed components added to it, Returns vector of the entityIds
@@ -126,7 +140,7 @@ namespace ECS
 		template<typename T, typename ... Args>
 		T* AddComponentToEntity( EntityId entityId, Args&& ... args )
 		{
-			return m_componentManager->AddComponent<T, Args ...>( entityId, std::forward<Args>(args) ...  );
+			return m_componentManager->AddComponent<T, Args ...>( entityId, std::forward<Args>( args ) ... );
 		}
 
 		// Removes component from entity with passed EntityId, if Component exists on entity
