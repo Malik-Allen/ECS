@@ -37,6 +37,7 @@ namespace ECS
 		ComponentManager* m_componentManager;
 
 
+
 	public:
 
 		// Constructs ECS system
@@ -135,6 +136,7 @@ namespace ECS
 		// GetAllEntitiesWithComponents< ... Components>()
 			// Returns a vector of entity ids, that have the components passed
 
+		
 
 		// Adds Component to entity with passed EntityId
 		template<typename T, typename ... Args>
@@ -164,6 +166,14 @@ namespace ECS
 		{
 			m_systemManager->UnregisterSystem<T>();
 		}
+
+		// Registers Systems, inside of system manager
+		template<typename T>
+		T* GetSystem()
+		{
+			return m_systemManager->GetSystem<T>();
+		}
+
 
 		// Update World Systems
 		void Update( float deltaTime )

@@ -95,7 +95,7 @@ public:
 
 
 
-int main(int args, char* argv[]) {
+static int run_example() {
 
 	
 	ECS::EntityManager* entityManager = new ECS::EntityManager();	
@@ -164,10 +164,16 @@ int main(int args, char* argv[]) {
 
 	world1->Update(0.0f);
 
+	AudioSystem* a = world1->GetSystem<AudioSystem>();
+	a->Update( 10.0f );
+
+	std::cout << "Completed World Process!" << std::endl;
+
 	delete world1;
 	world1 = nullptr;
 
-	std::cout << "Completed World Process!" << std::endl;
+	std::cout << "Test Complete!" << std::endl;
+
 	// componentManager->AddComponent<RenderComponent>( id );
 	// componentManager->AddComponent<PhysicsComponent>(id);
 	// componentManager->AddComponent<AudioComponent>(id);

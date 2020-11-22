@@ -108,7 +108,39 @@ namespace ECS {
 
 		}
 
-		
+		template <typename T>
+		T* GetSystem()
+		{
+			// Complile-time check to see if class T can be converted to class B, 
+				// valid for derivation check of class T from class B
+			CanConvert_From<T, ISystem>();
+
+			ISystem* system = nullptr;
+			for ( auto* s : m_activeSystems )
+			{
+
+
+				if ( s != nullptr )
+				{
+
+					if ( T::ID == s->m_systemId )
+					{
+						// When we find a system with the same id, we will remove it from our array of active systems
+						return dynamic_cast<T*>(s);
+					}
+
+
+				}
+				else // The moment we find a null system, we now we are at the end of the array, no need to continue
+				{
+					break;
+				}
+
+
+			}
+
+			return nullptr;
+		}
 
 		// Calls Update on all active systems, inside of this system manager
 		void Update( float deltaTime )
