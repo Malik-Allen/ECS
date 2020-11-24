@@ -151,7 +151,7 @@ static int run_example() {
 
 	world1->RegisterSystem<AudioSystem>();
 
-	std::vector<ECS::EntityId> worldEntities = world1->CreateEntitiesWithComponents<PhysicsComponent, AudioComponent>(1000);
+	std::vector<ECS::EntityId> worldEntities = world1->CreateEntitiesWithComponents<PhysicsComponent, AudioComponent>(25);
 
 	for ( size_t i = 0; i < worldEntities.size(); i++ )
 	{
@@ -169,10 +169,31 @@ static int run_example() {
 
 	std::cout << "Completed World Process!" << std::endl;
 
-	delete world1;
-	world1 = nullptr;
+	// delete world1;
+	// world1 = nullptr;
+
+
+	auto parser = ECS::Parser<AudioComponent, PhysicsComponent>( world1 );
 
 	std::cout << "Test Complete!" << std::endl;
+
+	auto list = parser.GetComponents();
+
+	for ( auto& e : list )
+	{
+		AudioComponent* a = std::get<AudioComponent*>( e );
+		PhysicsComponent* p = std::get<PhysicsComponent*>( e );
+
+		if ( a )
+		{
+			std::cout << "Found Audio Component" << std::endl;
+		}
+
+		if ( p )
+		{
+			std::cout << "Found Physics Component" << std::endl;
+		}
+	}
 
 	// componentManager->AddComponent<RenderComponent>( id );
 	// componentManager->AddComponent<PhysicsComponent>(id);

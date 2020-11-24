@@ -10,6 +10,9 @@ namespace ECS
 
 	class EntityManager
 	{
+		template<typename ... T >
+		friend struct Parser;
+
 		friend class ComponentManager;
 
 		// The entities created by this Entity Manager

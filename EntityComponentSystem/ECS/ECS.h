@@ -5,6 +5,7 @@
 #include "include/World.h"
 #include "include/Component.h"
 #include "include/System.h"
+#include "include/Parser.h"
 
 
 #endif // !ECS_H

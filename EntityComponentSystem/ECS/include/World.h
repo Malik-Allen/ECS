@@ -36,7 +36,8 @@ namespace ECS
 
 		ComponentManager* m_componentManager;
 
-
+		template<typename ... T >
+		friend struct Parser;
 
 	public:
 
