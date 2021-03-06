@@ -8,3 +8,4 @@ User's Manual:
 5. Every System must be unique, meaning: Multiple Systems of the same type/class being registered is currently not supported
 6. Every Component class must have a public static constexpr uint32_t ID = GENERATE_ID( "EXAMPLE_Component" );
 7. Every System class must have public static constexpr uint32_t ID = GENERATE_ID( "EXAMPLE_System" );
+8. The Parser can be used to obtain the Entities with Components auto entitiesWithComponents = Parser<ExampleComponent1, ExampleComponent2>(World*);
