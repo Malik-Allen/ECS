@@ -4,12 +4,12 @@
 #include <string>
 
 enum class LOG : unsigned short {
-	NONE = 0,
-	FATAL,
-	ERROR,
-	WARNING,
-	TRACE,
-	INFO
+	NONE	= 0,
+	FATAL	= 1,
+	ERROR	= 2,
+	WARNING	= 3,
+	TRACE	= 4,
+	INFO	= 5
 };
 
 constexpr static const char* ToString( LOG logType )
