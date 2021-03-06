@@ -2,6 +2,7 @@
 #define ENTITYMANAGER_H
 
 #include "Entity.h"
+#include "Utility/Debug.h"
 
 #include <map>
 
@@ -36,8 +37,11 @@ namespace ECS
 		// Creates an Entity, returns an EntityId, returns 0 if the entity was not created
 		EntityId CreateEntity()
 		{
+
+			/*'>' check works for entity counter, because the 0 entity id is reserved for an invalid entity id, and an entity id is incremented as its assigned*/
 			if (m_entityCounter > MAX_ENTITIES) {
-				// Some Debug
+				DEBUG_LOG( LOG::WARNING, "Failed to create entity: Max entity count reached" );
+				CONSOLE_LOG( LOG::WARNING, "Failed to create entity: Max entity count reached" );
 				return 0;
 			}
 
@@ -45,7 +49,8 @@ namespace ECS
 
 			if ( entity == nullptr )
 			{
-				// Some Debug
+				DEBUG_LOG( LOG::WARNING, "Failed to create entity: Entity is nullptr" );
+				CONSOLE_LOG( LOG::WARNING, "Failed to create entity: Entity is nullptr" );
 				return 0;
 			}
 
@@ -66,7 +71,8 @@ namespace ECS
 			// Entity does not exist, returning
 			if ( entity == nullptr )
 			{
-				// Some debug
+				DEBUG_LOG( LOG::WARNING, "Failed to destroy entity: Entity Id: " + std::to_string(entityId) + ", entity does not exist");
+				CONSOLE_LOG( LOG::WARNING, "Failed to destroy entity: Entity Id: " + std::to_string( entityId ) + ", entity does not exist" );
 				return;
 			}
 
@@ -91,7 +97,8 @@ namespace ECS
 				// Entity does not exist, returning
 				if (entity == nullptr)
 				{
-					// Some debug
+					DEBUG_LOG( LOG::WARNING, "Failed to destroy entity: Entity Id: " + std::to_string( i ) + ", reached end of valid entities to destroy... ending destroy..." );
+					CONSOLE_LOG( LOG::WARNING, "Failed to destroy entity: Entity Id: " + std::to_string( i ) + ", reached end of valid entities to destroy... ending destroy..." );
 					return;
 				}
 

@@ -40,7 +40,8 @@ namespace ECS {
 
 			if (m_systemsCounter >= MAX_SYSTEMS) 
 			{
-				// Some Debug
+				DEBUG_LOG( LOG::WARNING, "Failed to register system: Max system count reached" );
+				CONSOLE_LOG( LOG::WARNING, "Failed to register entity: Max system count reached" );
 				return nullptr;
 			}
 
@@ -48,6 +49,8 @@ namespace ECS {
 
 			if ( system == nullptr )
 			{
+				DEBUG_LOG( LOG::WARNING, "Failed to create system: system is nullptr" );
+				CONSOLE_LOG( LOG::WARNING, "Failed to create system: system is nullptr" );
 				return nullptr;
 			}
 

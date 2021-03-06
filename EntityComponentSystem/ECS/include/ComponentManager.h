@@ -59,22 +59,26 @@ namespace ECS
 				// valid for derivation check of class T from class B
 			CanConvert_From<T, Component>();
 
+			/* '>=' check work here because we increment component count after adding a component, and the counter begins 0 for the first index of the component map */
 			if ( m_componentCounter >= MAX_COMPONENTS )	// We are at capacity, return 
 			{
-				// Some Debug
+				DEBUG_LOG( LOG::WARNING, "Failed to create component: Max component count reached" );
+				CONSOLE_LOG( LOG::WARNING, "Failed to create component: Max component count reached" );
 				return nullptr;
 			}
 
 			Entity* entity = m_entityManager->m_entities[entityId];
 			if ( entity == nullptr )	// Entity does not exist
 			{
-				// Some Debug
+				DEBUG_LOG( LOG::WARNING, "Failed to find entity: Entity Id: " + std::to_string(entityId) + ", entity does not exist" );
+				CONSOLE_LOG( LOG::WARNING, "Failed to find entity: Entity Id: " + std::to_string( entityId ) + ", entity does not exist" );
 				return nullptr;
 			}
 
 			if ( entity->m_componentCounter >= MAX_COMPONENTS_PER_ENTITY )	// This entity is at its capacity
 			{
-				// Some debug
+				DEBUG_LOG( LOG::WARNING, "Failed to add component to entity: Entity Id: " + std::to_string( entityId ) + ", max component count on entity reached" );
+				CONSOLE_LOG( LOG::WARNING, "Failed to add component to entity: Entity Id: " + std::to_string( entityId ) + ", max component count on entity reached" );
 				return nullptr;
 			}
 
@@ -83,7 +87,8 @@ namespace ECS
 
 			if ( component == nullptr )	// Could not create component
 			{
-				// Some Debug
+				DEBUG_LOG( LOG::WARNING, "Failed to create component: component is nullptr" );
+				CONSOLE_LOG( LOG::WARNING, "Failed to create component: component is nullptr" );
 				return nullptr;
 			}
 
@@ -121,7 +126,8 @@ namespace ECS
 			Entity* entity = m_entityManager->m_entities[entityId];
 			if ( entity == nullptr )	// Entity does not exist
 			{
-				// Some Debug
+				DEBUG_LOG( LOG::WARNING, "Failed to find entity: Entity Id: " + std::to_string( entityId ) + ", entity does not exist" );
+				CONSOLE_LOG( LOG::WARNING, "Failed to find entity: Entity Id: " + std::to_string( entityId ) + ", entity does not exist" );
 				return;
 			}
 
@@ -188,7 +194,8 @@ namespace ECS
 			Entity* entity = m_entityManager->m_entities[entityId];
 			if (entity == nullptr)	// Entity does not exist
 			{
-				// Some Debug
+				DEBUG_LOG( LOG::WARNING, "Failed to find entity: Entity Id: " + std::to_string( entityId ) + ", entity does not exist" );
+				CONSOLE_LOG( LOG::WARNING, "Failed to find entity: Entity Id: " + std::to_string( entityId ) + ", entity does not exist" );
 				return;
 			}
 

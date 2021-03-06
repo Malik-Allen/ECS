@@ -23,7 +23,7 @@ namespace ECS
 				return;
 			}
 
-			int entityCount = world->m_enityManager->m_entityCounter;
+			uint64_t entityCount = world->m_enityManager->m_entityCounter;
 
 			for ( int i = 1; i <= entityCount; i++ )
 			{
