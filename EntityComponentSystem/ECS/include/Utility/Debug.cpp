@@ -1,4 +1,4 @@
-#include "../Debug.h"
+#include "Debug.h"
 #include <fstream>
 #include <iostream>
 #include <time.h>
