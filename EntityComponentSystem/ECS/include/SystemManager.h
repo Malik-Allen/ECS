@@ -2,6 +2,7 @@
 #define SYSTEMMANAGER_H
 
 #include "Utility/TemplateHelper.h"
+#include "Utility/Debug.h"
 #include "ECS_Definitions.h"
 #include "ISystem.h"
 
@@ -24,9 +25,13 @@ namespace ECS {
 
 	public:
 
-		SystemManager() : m_activeSystems(), m_systemsCounter( 0 ) {}
+		SystemManager() : m_activeSystems(), m_systemsCounter( 0 ) 
+		{
+			DEBUG_LOG( LOG::INFO, "System Manager created... " );
+			CONSOLE_LOG( LOG::INFO, "System Manager created... " );
+		}
 		
-		~SystemManager() { UnregisterAllSystems(); }
+		~SystemManager() { DeregisterAllSystems(); }
 
 
 		// Add a System to this System Manager
@@ -65,7 +70,7 @@ namespace ECS {
 
 		// Removes System of the passed type from the list of Systems on this Manager
 		template <typename T>
-		void UnregisterSystem() 
+		void DeregisterSystem()
 		{
 			// Complile-time check to see if class T can be converted to class B, 
 				// valid for derivation check of class T from class B
@@ -180,9 +185,11 @@ namespace ECS {
 
 		}
 
-		// Unregisters all systems
-		void UnregisterAllSystems()
+		// Deregisters all systems
+		void DeregisterAllSystems()
 		{
+			DEBUG_LOG( LOG::INFO, "Deregistering all systems..." );
+			CONSOLE_LOG( LOG::INFO, "Deregistering all systems..." );
 
 			for (auto* s : m_activeSystems) {
 
@@ -196,6 +203,9 @@ namespace ECS {
 			}
 
 			m_activeSystems.empty();
+
+			DEBUG_LOG( LOG::INFO, "Deregistering all systems... COMPLETE" );
+			CONSOLE_LOG( LOG::INFO, "Deregistering all systems... COMPLETE" );
 
 		}
 

@@ -19,9 +19,9 @@ namespace ECS
 		Entity() : m_entityId( 0 ), m_componentCounter( 0 ), m_components() {}
 		~Entity() {}	
 
-		const EntityId& GetId() const { return m_entityId; }
-		const uint64_t& GetComponentCount() const { return m_componentCounter; }
-		const std::array<class Component*, MAX_COMPONENTS_PER_ENTITY>& GetComponents() const { return m_components; }
+		inline const EntityId& GetId() const { return m_entityId; }
+		inline const uint64_t& GetComponentCount() const { return m_componentCounter; }
+		inline const std::array<class Component*, MAX_COMPONENTS_PER_ENTITY>& GetComponents() const { return m_components; }
 
 	private:
 

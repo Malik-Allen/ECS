@@ -30,7 +30,11 @@ namespace ECS
 
 	public:
 
-		EntityManager() : m_entityCounter( 0 ) {}
+		EntityManager() : m_entityCounter( 0 ) 
+		{
+			DEBUG_LOG( LOG::INFO, "Entity Manager created... " );
+			CONSOLE_LOG( LOG::INFO, "Entity Manager created... " );
+		}
 
 		~EntityManager() { DestroyAllEntities(); }
 
@@ -38,7 +42,7 @@ namespace ECS
 		EntityId CreateEntity()
 		{
 
-			/*'>' check works for entity counter, because the 0 entity id is reserved for an invalid entity id, and an entity id is incremented as its assigned*/
+			/* '>' check works for entity counter, because the 0 entity id is reserved for an invalid entity id, and an entity id is incremented as its assigned*/
 			if (m_entityCounter > MAX_ENTITIES) {
 				DEBUG_LOG( LOG::WARNING, "Failed to create entity: Max entity count reached" );
 				CONSOLE_LOG( LOG::WARNING, "Failed to create entity: Max entity count reached" );
@@ -55,7 +59,6 @@ namespace ECS
 			}
 
 			entity->m_entityId = ++m_entityCounter;
-
 			m_entities[m_entityCounter] = entity;
 
 			return m_entityCounter;
@@ -89,6 +92,8 @@ namespace ECS
 		// Warning, does not destroy all components on the entities
 		void DestroyAllEntities()
 		{
+			DEBUG_LOG( LOG::INFO, "Destroying all entities... " );
+			CONSOLE_LOG( LOG::INFO, "Destroying all entities... " );
 			Entity* entity = nullptr;
 			for (uint64_t i = 0; i < m_entityCounter; i++)
 			{

@@ -2,6 +2,7 @@
 #define COMPONENTMANAGER_H
 
 #include "Utility/TemplateHelper.h"
+#include "Utility/Debug.h"
 #include "Component.h"
 #include "EntityManager.h"
 #include "SystemManager.h"
@@ -46,7 +47,10 @@ namespace ECS
 			m_componentCounter( 0 ), 
 			m_entityManager(entityManager) ,
 			m_systemManager( systemManager )
-		{}
+		{
+			DEBUG_LOG( LOG::INFO, "Component Manager created... " );
+			CONSOLE_LOG( LOG::INFO, "Component Manager created... " );
+		}
 
 		~ComponentManager() { RemoveAllComponentsOnManager(); }
 
@@ -222,6 +226,8 @@ namespace ECS
 
 		void RemoveAllComponentsOnManager()
 		{
+			DEBUG_LOG( LOG::INFO, "Removing all components... " );
+			CONSOLE_LOG( LOG::INFO, "Removing all components... " );
 			for (size_t i = 0; i < m_components.size(); i++)
 			{
 
@@ -234,6 +240,9 @@ namespace ECS
 			}
 
 			m_componentMap.clear();
+
+			DEBUG_LOG( LOG::INFO, "Removing all components... COMPLETE" );
+			CONSOLE_LOG( LOG::INFO, "Removing all components... COMPLETE" );
 		}
 
 

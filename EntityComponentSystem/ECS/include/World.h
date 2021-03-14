@@ -6,10 +6,9 @@
 #include "SystemManager.h"
 
 #include "Utility/TemplateHelper.h"
+#include "Utility/Debug.h"
 
 #include <vector>
-
-#include <iostream>
 
 namespace ECS
 {
@@ -46,12 +45,17 @@ namespace ECS
 			m_enityManager( new ECS::EntityManager() ),
 			m_systemManager( new ECS::SystemManager() ),
 			m_componentManager( new ECS::ComponentManager( m_enityManager, m_systemManager ) )
-		{}
+		{
+			DEBUG_LOG( LOG::INFO, "World created... " );
+			CONSOLE_LOG( LOG::INFO, "World created... " );
+		}
 
 		// Cleans and deletes ecs system
 		~World()
 		{
 			// Each Manager will handle the destruction of their items
+			DEBUG_LOG( LOG::INFO, "Destroying world... " );
+			CONSOLE_LOG( LOG::INFO, "Destroying world... " );
 
 			// Systems get deleted first, so when we remove components, they no longer
 			if ( m_systemManager )
@@ -73,11 +77,17 @@ namespace ECS
 				delete m_enityManager;
 				m_enityManager = nullptr;
 			}
+
+			DEBUG_LOG( LOG::INFO, "Destroying world... COMPLETE" );
+			CONSOLE_LOG( LOG::INFO, "Destroying world... COMPLETE" );
 		}
 
 		// Will create the number of entities passed, given that you do not exceed entity limits
 		std::vector<EntityId> CreateEntities( uint64_t numberOfEntities )
 		{
+			DEBUG_LOG( LOG::INFO, "Creating: " + std::to_string( numberOfEntities ) + " entities" );
+			CONSOLE_LOG( LOG::INFO, "Creating: " + std::to_string( numberOfEntities ) + " entities" );
+
 			std::vector<EntityId> createdEntities;
 			EntityId currentEntityId;
 
@@ -90,8 +100,11 @@ namespace ECS
 				{
 					createdEntities.push_back( currentEntityId );
 				}
-				
+
 			}
+
+			DEBUG_LOG( LOG::INFO, "Succeffully created: " + std::to_string( createdEntities.size() ) + " entities" );
+			CONSOLE_LOG( LOG::INFO, "Succeffully created: " + std::to_string( createdEntities.size() ) + " entities" );
 
 			return createdEntities;
 		}
@@ -101,15 +114,15 @@ namespace ECS
 		template<class ... Components>
 		std::vector<EntityId> CreateEntitiesWithComponents( uint64_t numberOfEntities )
 		{
-			std::cout << "Creating " << numberOfEntities << " entities..." << std::endl;
+
+			DEBUG_LOG( LOG::INFO, "Creating: " + std::to_string( numberOfEntities ) + " entities" );
+			CONSOLE_LOG( LOG::INFO, "Creating: " + std::to_string( numberOfEntities ) + " entities" );
+
 			std::vector<EntityId> createdEntities;
 			EntityId currentEntityId = 0;
 			for ( int i = 0; i < numberOfEntities; i++ )
 			{
 				currentEntityId = m_enityManager->CreateEntity();
-
-				std::cout << "Current Iteration: " << i << std::endl;
-				std::cout << "Current EntityId: " << currentEntityId << std::endl;
 
 				if ( currentEntityId != 0 )
 					// A valid Entity Id is a non-zero number, therefore add components to valid entities
@@ -123,6 +136,9 @@ namespace ECS
 
 			}
 
+			DEBUG_LOG( LOG::INFO, "Succeffully created: " + std::to_string( createdEntities.size() ) + " entities" );
+			CONSOLE_LOG( LOG::INFO, "Succeffully created: " + std::to_string( createdEntities.size() ) + " entities" );
+
 			return createdEntities;
 
 		}
@@ -130,6 +146,9 @@ namespace ECS
 		// Destroys Entity with the passed EntityId, removing all components in the process
 		void DestroyEntity( EntityId entityId )
 		{
+			DEBUG_LOG( LOG::INFO, "Destroying entity with id: " + std::to_string( entityId ) );
+			CONSOLE_LOG( LOG::INFO, "Destroying entity with id: " + std::to_string( entityId ) );
+
 			m_componentManager->RemoveAllComponents( entityId );
 			m_enityManager->DestroyEntity( entityId );
 		}
@@ -137,12 +156,14 @@ namespace ECS
 		// GetAllEntitiesWithComponents< ... Components>()
 			// Returns a vector of entity ids, that have the components passed
 
-		
+
 
 		// Adds Component to entity with passed EntityId
 		template<typename T, typename ... Args>
 		T* AddComponentToEntity( EntityId entityId, Args&& ... args )
 		{
+			DEBUG_LOG( LOG::INFO, "Adding component with id: " + std::to_string( T::ID ) + " to entity with id: " + std::to_string( entityId ) );
+			CONSOLE_LOG( LOG::INFO, "Adding component with id: " + std::to_string( T::ID ) + " to entity with id: " + std::to_string( entityId ) );
 			return m_componentManager->AddComponent<T, Args ...>( entityId, std::forward<Args>( args ) ... );
 		}
 
@@ -150,6 +171,8 @@ namespace ECS
 		template<typename T>
 		void RemoveComponentFromEntity( EntityId entityId )
 		{
+			DEBUG_LOG( LOG::INFO, "Removing component with id: " + std::to_string( T::ID ) + " from entity with id: " + std::to_string( entityId ) );
+			CONSOLE_LOG( LOG::INFO, "Removing component with id: " + std::to_string( T::ID ) + " from entity with id: " + std::to_string( entityId ) );
 			m_componentManager->RemoveComponent<T>( entityId );
 		}
 
@@ -158,14 +181,18 @@ namespace ECS
 		template<typename T>
 		T* RegisterSystem()
 		{
+			DEBUG_LOG( LOG::INFO, "Registering system with id: " + std::to_string( T::ID ) );
+			CONSOLE_LOG( LOG::INFO, "Registering system with id: " + std::to_string( T::ID ) );
 			return m_systemManager->RegisterSystem<T>();
 		}
 
-		// Unregisters system from system manager
+		// Deregisters system from system manager
 		template<typename T>
-		void UnregisterSystem()
+		void DeregisterSystem()
 		{
-			m_systemManager->UnregisterSystem<T>();
+			DEBUG_LOG( LOG::INFO, "Deregistering system with id: " + std::to_string( T::ID ) );
+			CONSOLE_LOG( LOG::INFO, "Deregistering system with id: " + std::to_string( T::ID ) );
+			m_systemManager->DeregisterSystem<T>();
 		}
 
 		// Registers Systems, inside of system manager
@@ -193,7 +220,9 @@ namespace ECS
 				// valid for derivation check of class T from class B
 			CanConvert_From<ComponentClass, Component>();
 
-			std::cout << "Adding Component to Entity: " << entityId << std::endl;
+			DEBUG_LOG( LOG::INFO, "Adding component: " + std::to_string( ComponentClass::ID ) + " to entity with id: " + std::to_string( entityId ) + " Index: " + std::to_string( INDEX ) );
+			CONSOLE_LOG( LOG::INFO, "Adding component: " + std::to_string( ComponentClass::ID ) + " to entity with id: " + std::to_string( entityId ) + " Index: " + std::to_string( INDEX ) );
+
 			if ( m_componentManager->AddComponent<ComponentClass>( entityId ) != nullptr )
 				// When we successfully add a component, carry on with the process
 			{
@@ -204,7 +233,11 @@ namespace ECS
 		}
 
 		template<size_t INDEX>
-		void AddNewComponentToEntity( EntityId entityId ) { std::cout << "Completed Adding Components to Entity: " << entityId << std::endl; }
+		void AddNewComponentToEntity( EntityId entityId )
+		{
+			DEBUG_LOG( LOG::INFO, "Adding component: COMPLETE: entity with id: " + std::to_string( entityId ) + " Index: " + std::to_string( INDEX ) );
+			CONSOLE_LOG( LOG::INFO, "Adding component: COMPLETE: entity with id: " + std::to_string( entityId ) + " Index: " + std::to_string( INDEX ) );
+		}
 
 
 	};

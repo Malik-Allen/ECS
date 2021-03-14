@@ -1,4 +1,5 @@
 #include "ECS/ECS.h"
+#include "ECS/include/Utility/Debug.h"
 
 
 
@@ -94,10 +95,10 @@ public:
 };
 
 
-
 static int run_example() {
 
-	
+	DEBUG_INIT();
+
 	ECS::EntityManager* entityManager = new ECS::EntityManager();	
 	ECS::SystemManager* systemManager = new ECS::SystemManager();
 	ECS::ComponentManager* componentManager = new ECS::ComponentManager(entityManager, systemManager);
@@ -106,8 +107,8 @@ static int run_example() {
 	systemManager->RegisterSystem<PhysicsSystem>();
 
 	for (int i = 1; i <= 1000; i++) {
-
-		std::cout << "New Entity with Id: " << entityManager->CreateEntity() << std::endl;
+		entityManager->CreateEntity();
+		// std::cout << "New Entity with Id: " <<  << std::endl;
 
 	}
 
@@ -118,7 +119,7 @@ static int run_example() {
 		componentManager->AddComponent<RenderComponent>( i, 15.0f );
 			
 	}
-	/*systemManager->UnregisterSystem<AudioSystem>();*/
+	systemManager->DeregisterSystem<AudioSystem>();
 	systemManager->Update(0.0f);
 
 	for (int i = 1; i <= 1000; i++)
@@ -160,7 +161,7 @@ static int run_example() {
 
 	}
 
-	// world1->RemoveComponentFromEntity<RenderComponent>(256);
+	world1->RemoveComponentFromEntity<RenderComponent>(25);
 
 	world1->Update(0.0f);
 
@@ -169,9 +170,10 @@ static int run_example() {
 
 	std::cout << "Completed World Process!" << std::endl;
 
-	// delete world1;
-	// world1 = nullptr;
+	delete world1;
+	world1 = nullptr;
 
+	return 0;
 
 	auto parser = ECS::Parser<AudioComponent, PhysicsComponent>( world1 );
 

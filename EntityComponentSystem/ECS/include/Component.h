@@ -35,11 +35,11 @@ namespace ECS {
 
 		virtual ~Component() {}
 
-		const EntityId& GetOwnerEntity() const { return m_ownerId; }
+		inline const EntityId& GetOwnerEntity() const { return m_ownerId; }
 
-		const ComponentId& GetComponentId() const { return m_componentId; }
+		inline const ComponentId& GetComponentId() const { return m_componentId; }
 
-		const uint64_t& GetComponentType() const { return m_componentType; }
+		inline const uint64_t& GetComponentType() const { return m_componentType; }
 
 	};
 
